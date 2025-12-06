@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Secure Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        /* Glass effect enhancement */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 flex flex-col items-center justify-center min-h-screen p-4 text-slate-800">
+
+    <!-- Decorative background elements -->
+    <div class="fixed top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 shadow-md z-10"></div>
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+
+    <!-- ==================== LOGIN PANEL ==================== -->
+    <div id="login-panel" class="glass-panel w-full max-w-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 overflow-hidden relative fade-in ring-1 ring-black/5">
+        <div class="p-8">
+            <div class="flex justify-center mb-8">
+                <div class="bg-gradient-to-tr from-blue-50 to-white p-4 rounded-2xl shadow-sm border border-blue-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+            </div>
+            
+            <h2 id="login-title" class="text-center text-2xl font-bold text-slate-800 mb-2 tracking-tight">Identity Verification</h2>
+            <p id="login-desc" class="text-center text-slate-500 text-sm mb-8 leading-relaxed">Enter your authorized email to access the secure portal.</p>
+
+            <div class="space-y-5">
+                
+                <!-- STEP 1: EMAIL -->
+                <div id="step-email">
+                    <div class="relative group">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
+                        <input type="email" id="email-input" 
+                            class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all duration-200 text-slate-800 placeholder-slate-400 font-medium" 
+                            placeholder="name@company.com"
+                            onkeypress="if(event.key === 'Enter') checkEmail()">
+                    </div>
+                    
+                    <button onclick="checkEmail()" id="email-btn"
+                        class="w-full mt-6 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-blue-900/20 hover:shadow-blue-900/30 flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                        <span>Continue Securely</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </button>
+                </div>
+
+                <!-- STEP 2: PASSWORD (Returning User) -->
+                <div id="step-password" class="hidden">
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Enter Password</label>
+                        <input type="password" id="password-input" 
+                            class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all duration-200 text-slate-800" 
+                            placeholder="••••••••"
+                            onkeypress="if(event.key === 'Enter') verifyPassword()">
+                    </div>
+                    
+                    <button onclick="verifyPassword()" id="login-btn"
+                        class="w-full mt-6 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-blue-900/20 hover:shadow-blue-900/30 flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                        <span>Authenticate</span>
+                    </button>
+                    
+                    <div class="flex justify-between mt-4 px-1">
+                        <button onclick="resetFlow()" class="text-xs font-medium text-slate-400 hover:text-blue-600 transition-colors flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                            Back
+                        </button>
+                        <button onclick="forceResetPassword()" class="text-xs font-medium text-red-400 hover:text-red-600 transition-colors">Reset Password</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: SETUP (First Time User) -->
+                <div id="step-setup" class="hidden">
+                    <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-4 mb-5 backdrop-blur-sm">
+                        <div class="flex gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <p class="text-xs text-amber-800 leading-relaxed"><strong>First Time Access:</strong> Create a secure password for this device. It will be stored locally in your secure vault.</p>
+                        </div>
+                    </div>
+                    
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Create Password</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-password-input" 
+                            class="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none" 
+                            placeholder="Type or Generate">
+                        
+                        <button onclick="generateSecurePassword()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 rounded-xl font-medium text-xs transition-colors whitespace-nowrap border border-slate-200">
+                            Auto-Gen
+                        </button>
+                    </div>
+
+                    <button onclick="saveNewPassword()" id="setup-btn"
+                        class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                        <span>Save & Login</span>
+                    </button>
+                    <button onclick="resetFlow()" class="w-full mt-3 text-xs font-medium text-slate-400 hover:text-blue-600">Cancel</button>
+                </div>
+
+            </div>
+
+            <p id="login-message" class="mt-4 text-center text-xs font-semibold min-h-[20px]"></p>
+        </div>
+        <div class="bg-slate-50/80 backdrop-blur p-4 text-center border-t border-slate-100">
+             <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">website created by yassine el dirssi , copyright 2026</p>
+        </div>
+    </div>
+
+
+    <!-- ==================== APP PANEL ==================== -->
+    <div id="app-panel" class="hidden glass-panel w-full max-w-md rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white/50 overflow-hidden relative fade-in ring-1 ring-black/5">
+        <!-- Header -->
+        <div class="bg-gradient-to-b from-white to-slate-50 p-6 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-800 leading-tight tracking-tight">Secure Generate</h1>
+                    <p id="user-display" class="text-[10px] text-blue-600 font-bold tracking-widest uppercase mt-0.5">AUTHORIZED ACCESS</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                <div class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </div>
+                <span class="text-[10px] text-emerald-700 font-bold uppercase tracking-wide">Online</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8">
+            <p class="text-slate-500 text-sm mb-6 text-center font-medium">Click the button below to retrieve a secure line.</p>
+
+            <div id="result-container" class="bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-200 mb-8 min-h-[160px] flex flex-col items-center justify-center relative transition-all duration-300 hover:bg-slate-50">
+                <div id="success-tick" class="hidden absolute -top-3 -right-3 bg-emerald-500 text-white rounded-full p-1.5 shadow-lg scale-in z-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                </div>
+                <p id="display-area" class="text-slate-400 text-sm font-medium px-6 text-center">Waiting for transaction...</p>
+            </div>
+
+            <button id="generate-btn" onclick="generateRandomLine()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-xl shadow-blue-900/20 flex items-center justify-center gap-3 transform active:scale-[0.98] group">
+                <span id="btn-text" class="tracking-wide">Process Request</span>
+                <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-300 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </button>
+            <p id="status-text" class="mt-4 text-center text-xs text-slate-400 h-4 font-medium"></p>
+        </div>
+
+        <div class="bg-slate-50/80 backdrop-blur p-4 border-t border-slate-100 flex justify-between items-center">
+             <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">website created by yassine el dirssi , copyright 2026</p>
+             <button onclick="logout()" class="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline px-2 py-1 rounded">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // ================= CONFIGURATION =================
+        const DATA_SHEET_URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vRaYAkv_moHzev6xkWvGQYde3vblmq5TZEVd3ZWqNKGVfiJ5QBSMkfku1sUDtaPMKTIb765r46tH9Ew/pub?output=csv";
+        // The Sheet used for Email verification (Column A)
+        const WHITELIST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1m3vhtRVo2GoQwBXlFTUd-p-9xJzEEF1I50XvmEEs6-I/export?format=csv&gid=1550626836";
+        // =================================================
+
+        let storedLines = [];
+        let currentUserEmail = "";
+
+        const loadingMessages = [
+            "Initializing...",
+            "Please wait while we prepare your request.",
+            "Establishing connection to the database...",
+            "This may take a few moments.",
+            "Fetching data and processing information...",
+            "Your request is being carefully processed to ensure accuracy and efficiency.",
+            "Almost there...",
+            "The data is now being finalized.",
+            "Operation Complete!",
+            "Your task has been successfully generated and is ready for use."
+        ];
+
+        // --- AUTH FLOW ---
+
+        async function checkEmail() {
+            const emailInput = document.getElementById('email-input');
+            const btn = document.getElementById('email-btn');
+            const msg = document.getElementById('login-message');
+            const email = emailInput.value.trim().toLowerCase();
+
+            if (!email) { showError("Enter an email address."); return; }
+
+            // Loading UI
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            btn.disabled = true;
+            msg.innerText = "";
+
+            try {
+                // 1. Check Whitelist (Is user allowed in the Sheet?)
+                const response = await fetch(WHITELIST_SHEET_URL);
+                if (!response.ok) throw new Error("Database connection failed. Check link.");
+                
+                const data = await response.text();
+                const rows = data.split(/\r?\n/).map(row => row.toLowerCase());
+                
+                // Flexible check: Does the email exist in any row?
+                const isAuthorized = rows.some(row => row.includes(email));
+
+                if (!isAuthorized) {
+                    throw new Error("Email not found in authorized database.");
+                }
+
+                // 2. Email is Valid. Check Local Storage for Password.
+                currentUserEmail = email;
+                
+                // Get password safely
+                let storedPass = null;
+                try {
+                    storedPass = localStorage.getItem('bank_pass_' + email);
+                } catch (e) {
+                    console.error("Storage Access Error:", e);
+                }
+
+                document.getElementById('step-email').classList.add('hidden');
+                
+                if (storedPass) {
+                    // Password found in browser memory -> Login Screen
+                    document.getElementById('step-password').classList.remove('hidden');
+                    document.getElementById('login-desc').innerText = "Welcome back. Please login.";
+                    setTimeout(() => document.getElementById('password-input').focus(), 100);
+                } else {
+                    // No password found -> Registration Screen
+                    document.getElementById('step-setup').classList.remove('hidden');
+                    document.getElementById('login-desc').innerText = "First time access detected.";
+                }
+
+            } catch (e) {
+                showError(e.message);
+                btn.innerHTML = `<span>Continue Securely</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>`;
+            } finally {
+                if (!document.getElementById('step-email').classList.contains('hidden')) {
+                     btn.disabled = false;
+                     // Only restore text if we didn't hit catch block
+                     if(btn.innerHTML.includes('spin')) {
+                        btn.innerHTML = `<span>Continue Securely</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>`;
+                     }
+                }
+            }
+        }
+
+        function generateSecurePassword() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789#@!";
+            let pass = "";
+            for (let i = 0; i < 8; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('new-password-input').value = pass;
+        }
+
+        function saveNewPassword() {
+            const newPassInput = document.getElementById('new-password-input');
+            const newPass = newPassInput.value.trim();
+            const btn = document.getElementById('setup-btn');
+            
+            if (!newPass) {
+                showError("Please type or generate a password.");
+                return;
+            }
+            
+            // "Stocking" the password in Local Storage
+            try {
+                localStorage.setItem('bank_pass_' + currentUserEmail, newPass);
+                
+                // Verification Check: Read it back immediately to be sure
+                const check = localStorage.getItem('bank_pass_' + currentUserEmail);
+                if (check !== newPass) {
+                    throw new Error("Storage failed");
+                }
+                
+                // Success animation
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Saved!`;
+                setTimeout(completeLogin, 600);
+                
+            } catch(e) {
+                showError("Error saving to device memory. Try turning off private mode.");
+            }
+        }
+
+        function verifyPassword() {
+            const inputPass = document.getElementById('password-input').value;
+            const storedPass = localStorage.getItem('bank_pass_' + currentUserEmail);
+
+            if (inputPass === storedPass) {
+                completeLogin();
+            } else {
+                showError("Incorrect password.");
+                document.getElementById('password-input').value = '';
+            }
+        }
+
+        function completeLogin() {
+            document.getElementById('user-display').innerText = currentUserEmail.toUpperCase();
+            document.getElementById('login-panel').classList.add('hidden');
+            document.getElementById('app-panel').classList.remove('hidden');
+            fetchAppData();
+        }
+
+        // Feature to allow user to reset if they forgot the randomly generated one
+        function forceResetPassword() {
+            if(confirm("Are you sure you want to reset your local password?")) {
+                localStorage.removeItem('bank_pass_' + currentUserEmail);
+                resetFlow();
+                // Manually trigger the flow to go to setup
+                document.getElementById('step-email').classList.add('hidden');
+                document.getElementById('step-password').classList.add('hidden');
+                document.getElementById('step-setup').classList.remove('hidden');
+                document.getElementById('login-desc').innerText = "Resetting password...";
+            }
+        }
+
+        function resetFlow() {
+            document.getElementById('step-email').classList.remove('hidden');
+            document.getElementById('step-password').classList.add('hidden');
+            document.getElementById('step-setup').classList.add('hidden');
+            document.getElementById('login-message').innerText = "";
+            document.getElementById('password-input').value = "";
+            document.getElementById('new-password-input').value = "";
+            const emailBtn = document.getElementById('email-btn');
+            emailBtn.innerHTML = `<span>Continue Securely</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>`;
+            emailBtn.disabled = false;
+        }
+
+        function showError(text) {
+            const msg = document.getElementById('login-message');
+            msg.className = "mt-4 text-center text-xs font-bold text-red-600";
+            msg.innerText = text;
+            const panel = document.getElementById('login-panel');
+            panel.classList.remove('shake');
+            void panel.offsetWidth; 
+            panel.classList.add('shake');
+        }
+
+        function logout() {
+            // Soft logout
+            document.getElementById('email-input').value = "";
+            document.getElementById('password-input').value = "";
+            document.getElementById('new-password-input').value = "";
+            currentUserEmail = "";
+            
+            // Switch Panels
+            document.getElementById('app-panel').classList.add('hidden');
+            document.getElementById('login-panel').classList.remove('hidden');
+            
+            // Reset Flow to start
+            resetFlow();
+            document.getElementById('login-desc').innerText = "Enter your authorized email to access the secure portal.";
+        }
+
+        // --- APP DATA LOGIC ---
+        async function fetchAppData() {
+            const statusText = document.getElementById('status-text');
+            statusText.innerText = "Syncing...";
+            try {
+                const response = await fetch(DATA_SHEET_URL);
+                if (!response.ok) throw new Error("Data fetch error");
+                const data = await response.text();
+                const allRows = data.split(/\r?\n/);
+                storedLines = allRows.slice(0, 10).filter(line => line.trim() !== "");
+                statusText.innerText = "";
+            } catch (error) { 
+                console.error(error);
+                statusText.innerText = "System offline."; 
+            }
+        }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function generateRandomLine() {
+            const displayArea = document.getElementById("display-area");
+            const resultContainer = document.getElementById("result-container");
+            const successTick = document.getElementById("success-tick");
+            const btn = document.getElementById("generate-btn");
+            const btnText = document.getElementById("btn-text");
+            const btnIcon = document.getElementById("btn-icon");
+            
+            // Clear previous result and show loading state
+            displayArea.style.opacity = '0.5';
+            successTick.classList.add('hidden');
+            resultContainer.classList.remove('border-emerald-500', 'bg-emerald-50/50');
+            resultContainer.classList.add('border-slate-200', 'bg-slate-50/50');
+            
+            // Disable button
+            btn.disabled = true;
+            btnText.innerText = "Processing...";
+            btnIcon.classList.add("hidden");
+            
+            if (storedLines.length === 0) await fetchAppData();
+
+            if (storedLines.length > 0) {
+                // Show loading sequence
+                displayArea.style.opacity = '1';
+                displayArea.className = "text-slate-500 text-sm font-medium px-6 text-center italic transition-all duration-300";
+                
+                for (const msg of loadingMessages) {
+                    displayArea.innerText = msg;
+                    await delay(2500); 
+                }
+
+                // Final Generation
+                const randomIndex = Math.floor(Math.random() * storedLines.length);
+                let cleanLine = storedLines[randomIndex];
+                if (cleanLine.startsWith('"') && cleanLine.endsWith('"')) cleanLine = cleanLine.slice(1, -1);
+
+                // Show Result
+                displayArea.className = "text-slate-800 text-lg font-semibold fade-in break-words text-center px-4 z-10";
+                displayArea.innerText = cleanLine;
+
+                // Success Styling
+                successTick.classList.remove('hidden');
+                resultContainer.classList.remove('border-slate-200', 'bg-slate-50/50');
+                resultContainer.classList.add('border-emerald-300', 'bg-emerald-50/50');
+                
+            } else { 
+                displayArea.innerText = "No data available."; 
+            }
+            
+            // Re-enable button
+            btn.disabled = false;
+            btnText.innerText = "Process Request";
+            btnIcon.classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
